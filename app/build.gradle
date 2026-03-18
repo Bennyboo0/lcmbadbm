@@ -1,11 +1,15 @@
 import org.gradle.api.file.DuplicatesStrategy
-
 /*
  * Gradle build script for the BadBM application (app subproject).
  */
-
 plugins {
     id 'application'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 group = 'edu.touro.mco152.bm'
@@ -16,20 +20,17 @@ repositories {
 }
 
 dependencies {
-    // === BadBM runtime dependencies (from assignment) ===
-
     // Charting API / runtime
     implementation 'org.jfree:jfreechart:1.0.17'
 
-    // Persistence API and implementation
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.0.0'
-    implementation 'org.eclipse.persistence:eclipselink:3.0.2'
+    // Persistence + EclipseLink (4.0.5 supports Java 21; replaces the old 2-line combo)
+    implementation 'org.eclipse.persistence:eclipselink:4.0.5'
 
     // DBMS (Derby)
     implementation 'org.apache.derby:derby:10.15.2.0'
     implementation 'org.apache.derby:derbyshared:10.15.2.0'
 
-    // === Test dependencies (JUnit Jupiter + launcher) ===
+    // Test dependencies
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.10.2'
 }
@@ -39,27 +40,26 @@ application {
     mainClass = 'edu.touro.mco152.bm.App'
 }
 
+sourceSets {
+    // Makes sure resource files (persistence.xml) land alongside compiled classes
+    // so EclipseLink can find the entity classes and named queries
+    sourceSets.main.output.resourcesDir = sourceSets.main.java.classesDirectory
+}
+
 // Use JUnit Jupiter for tests
 tasks.named('test') {
     useJUnitPlatform()
 }
 
-// === Story #3: create a fat executable JAR named badbm.jar ===
+// === Story #3: fat executable JAR named badbm.jar ===
 jar {
-    // Name the jar exactly what the assignment wants
     archiveFileName = 'badbm.jar'
-
-    // Make it directly runnable with `java -jar badbm.jar`
     manifest {
         attributes(
                 'Main-Class': 'edu.touro.mco152.bm.App'
         )
     }
-
-    // Avoid duplicate entries when merging jars
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    // Make this a "fat jar": include all runtime dependencies
     from {
         configurations.runtimeClasspath.collect { file ->
             file.isDirectory() ? file : zipTree(file)
