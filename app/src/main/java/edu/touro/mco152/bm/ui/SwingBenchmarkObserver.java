@@ -17,7 +17,7 @@ public class SwingBenchmarkObserver implements BenchmarkObserver {
 
     }
 
-    /** Allow the worker to be set after construction, resolving the circular dependency. */
+    /** Allows the worker to be set after construction, resolving the circular dependency. */
     public void setWorker(SwingWorkerWrapper worker) {
         this.worker = worker;
     }
