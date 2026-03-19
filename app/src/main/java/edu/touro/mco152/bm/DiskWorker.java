@@ -33,17 +33,12 @@ public class DiskWorker extends SwingWorker<Boolean, DiskMark> implements Benchm
 
     /**
      * Construct a DiskWorker with a specific observer for UI callbacks.
-     * @param observer the UI/observer implementation to receive benchmark events
      */
     public DiskWorker(BenchmarkObserver observer) {
         this.observer = observer;
     }
 
-    /**
-     * Exposes SwingWorker's protected setProgress() so that
-     * SwingBenchmarkObserver can report progress without being
-     * a subclass of SwingWorker itself.
-     */
+
     @Override
     public void setProgressPublic(int percent) {
         setProgress(percent);

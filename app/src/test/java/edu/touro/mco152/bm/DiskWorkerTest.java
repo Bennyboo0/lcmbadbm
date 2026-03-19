@@ -18,10 +18,6 @@ public class DiskWorkerTest {
         setupDefaultAsPerProperties();
     }
 
-    /**
-     * Bruteforce setup of static classes/fields to allow DiskWorker to run.
-     * @author lcmcohen
-     */
     private static void setupDefaultAsPerProperties() {
         Gui.mainFrame = new MainFrame();
         App.p = new Properties();
@@ -52,10 +48,8 @@ public class DiskWorkerTest {
     @Test
     void testBenchmarkRunsWithoutSwing() throws Exception {
 
-        // Track progress updates to verify the engine is reporting them
         AtomicInteger lastProgressSeen = new AtomicInteger(-1);
 
-        // Use an anonymous subclass of NoOpBenchmarkObserver to capture progress
         BenchmarkObserver testObserver = new NoOpBenchmarkObserver() {
             @Override
             public void updateProgress(int percentComplete) {
@@ -63,7 +57,6 @@ public class DiskWorkerTest {
             }
         };
 
-        // Configure a small, fast benchmark
         App.writeTest = true;
         App.readTest = false;
         App.numOfMarks = 2;
@@ -73,17 +66,13 @@ public class DiskWorkerTest {
         App.multiFile = false;
         App.autoReset = true;
 
-        // Create and run the worker with no Swing involved
         DiskWorker worker = new DiskWorker(testObserver);
         worker.execute();
 
-        // Wait for completion (SwingWorker runs on a background thread)
         Boolean result = worker.get();
 
-        // Assert it completed successfully
         assertTrue(result, "Benchmark should complete successfully");
 
-        // Assert that progress was reported and reached a valid value
         assertTrue(lastProgressSeen.get() > 0,
                 "Progress should have been reported during execution");
     }

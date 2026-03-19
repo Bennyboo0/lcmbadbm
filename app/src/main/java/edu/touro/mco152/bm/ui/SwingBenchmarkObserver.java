@@ -6,21 +6,13 @@ import edu.touro.mco152.bm.DiskMark;
 import javax.swing.JOptionPane;
 
 /**
- * Swing-specific implementation of {@link BenchmarkObserver}.
- * Handles all GUI updates during a benchmark run, keeping Swing
- * details out of the core engine (DiskWorker).
- *
- * This class is the only place that should directly touch Gui,
- * JOptionPane, or any other Swing component during a benchmark.
+ * Swing-specific implementation of BenchmarkObserve.
  */
 public class SwingBenchmarkObserver implements BenchmarkObserver {
 
     private SwingWorkerWrapper worker;
 
-    /**
-     * @param worker the SwingWorker running the benchmark, needed so we
-     *               can call setProgress() and publish() on it
-     */
+    //I can now actually get rid of this constructor.
     public SwingBenchmarkObserver() {
 
     }

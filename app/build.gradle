@@ -51,7 +51,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-// === Story #3: fat executable JAR named badbm.jar ===
 jar {
     archiveFileName = 'badbm.jar'
     manifest {
