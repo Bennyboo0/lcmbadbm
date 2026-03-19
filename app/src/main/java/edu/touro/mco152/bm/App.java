@@ -4,6 +4,7 @@ import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
 import edu.touro.mco152.bm.ui.SelectFrame;
+import edu.touro.mco152.bm.ui.SwingBenchmarkObserver;
 
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.*;
@@ -263,7 +264,10 @@ public class App {
         Gui.mainFrame.adjustSensitivity();
 
         //4. set up disk worker thread and its event handlers
-        worker = new DiskWorker();
+        SwingBenchmarkObserver observer = new SwingBenchmarkObserver();
+        worker = new DiskWorker(observer);
+        observer.setWorker(worker);
+
         worker.addPropertyChangeListener((final PropertyChangeEvent event) -> {
             switch (event.getPropertyName()) {
                 case "progress":
@@ -279,7 +283,7 @@ public class App {
                             break;
                         case DONE:
                             break;
-                    } // end inner switch
+                    }
                     break;
             }
         });

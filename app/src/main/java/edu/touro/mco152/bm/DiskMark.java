@@ -80,4 +80,8 @@ public class DiskMark {
     }
 
     public enum MarkType {READ, WRITE}
+
+    public DiskMark.MarkType getType() {
+        return type;
+    }
 }
