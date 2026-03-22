@@ -357,7 +357,7 @@ public class App {
                  * This is a division error because instead of dividing by mn, I am not dividing by mn-1000.
                  * This will break this test: updateMetrics_multipleWriteMarks_maxGeAvgGeMin()
                  */
-                wAvg = (((double) (mn - 1) * wAvg) + mark.getBwMbSec()) / (double) (mn-1000);
+                wAvg = (((double) (mn - 1) * wAvg) + mark.getBwMbSec()) / (double) mn;
             }
             mark.setCumAvg(wAvg);
             mark.setCumMax(wMax);
