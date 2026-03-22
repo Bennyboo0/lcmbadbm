@@ -352,6 +352,11 @@ public class App {
                 wAvg = mark.getBwMbSec();
             } else {
                 int mn = mark.getMarkNum();
+                /**
+                 * Very Important! This is where I am putting in the bug, as described in point 8 of the homework.
+                 * This is a division error because instead of dividing by mn, I am not dividing by mn-1000.
+                 * This will break this test: updateMetrics_multipleWriteMarks_maxGeAvgGeMin()
+                 */
                 wAvg = (((double) (mn - 1) * wAvg) + mark.getBwMbSec()) / (double) mn;
             }
             mark.setCumAvg(wAvg);
