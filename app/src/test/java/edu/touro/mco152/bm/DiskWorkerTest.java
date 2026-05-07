@@ -66,12 +66,12 @@ public class DiskWorkerTest {
         App.multiFile = false;
         App.autoReset = true;
 
-        DiskWorker worker = new DiskWorker(testObserver);
-        worker.execute();
+        // Use PlainThreadRunner instead of DiskWorker directly
+        PlainThreadRunner runner = new PlainThreadRunner(testObserver);
+        runner.execute();
+        runner.waitForCompletion();  // blocks until the plain thread finishes
 
-        Boolean result = worker.get();
-
-        assertTrue(result, "Benchmark should complete successfully");
+        assertTrue(runner.getLastStatus(), "Benchmark should complete successfully");
 
         assertTrue(lastProgressSeen.get() > 0,
                 "Progress should have been reported during execution");

@@ -7,10 +7,5 @@ import edu.touro.mco152.bm.DiskMark;
  * needs to call (setProgress), without breaking encapsulation elsewhere. Now aint that something!
  */
 public interface SwingWorkerWrapper {
-
-    /**
-     * Public-facing wrapper around SwingWorker's protected setProgress().
-     * @param percent 0–100
-     */
     void setProgressPublic(int percent);
 }

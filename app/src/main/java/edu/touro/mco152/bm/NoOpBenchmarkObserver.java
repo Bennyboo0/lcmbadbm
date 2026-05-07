@@ -24,4 +24,10 @@ public class NoOpBenchmarkObserver implements BenchmarkObserver {
     @Override
     public void handleClearCacheRequest() {
     }
+
+    @Override
+    public void handleReadError(String message) {
+        // no-op: log it at most
+        System.err.println("Read error (no-op): " + message);
+    }
 }

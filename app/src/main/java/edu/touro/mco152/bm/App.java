@@ -1,10 +1,7 @@
 package edu.touro.mco152.bm;
 
 import edu.touro.mco152.bm.persist.DiskRun;
-import edu.touro.mco152.bm.ui.Gui;
-import edu.touro.mco152.bm.ui.MainFrame;
-import edu.touro.mco152.bm.ui.SelectFrame;
-import edu.touro.mco152.bm.ui.SwingBenchmarkObserver;
+import edu.touro.mco152.bm.ui.*;
 
 import javax.swing.SwingWorker.StateValue;
 import javax.swing.*;
@@ -46,7 +43,7 @@ public class App {
     public static int numOfMarks = 25;      // desired number of marks
     public static int numOfBlocks = 32;     // desired number of blocks
     public static int blockSizeKb = 512;    // size of a block in KBs
-    public static DiskWorker worker = null;
+    public static BenchmarkRunner worker = null;
     public static int nextMarkNumber = 1;   // number of the next mark
     public static double wMax = -1, wMin = -1, wAvg = -1;
     public static double rMax = -1, rMin = -1, rAvg = -1;
@@ -237,59 +234,26 @@ public class App {
     }
 
     public static void cancelBenchmark() {
-        if (worker == null) {
-            msg("worker is null abort...");
-            return;
-        }
-        worker.cancel(true);
+        if (worker == null) { msg("worker is null abort..."); return; }
+        worker.cancel();
     }
 
     public static void startBenchmark() {
-
-        //1. check that there isn't already a worker in progress
         if (state == State.DISK_TEST_STATE) {
-            //if (!worker.isCancelled() && !worker.isDone()) {
             msg("Test in progress, aborting...");
             return;
-            //}
         }
+        if (!setupDataArea()) return;
 
-        //2. Set up area on disk for benchmark files, either as specified, or in temp area
-        if (!setupDataArea()) {
-            return;
-        }
-
-        //3. update state
         state = State.DISK_TEST_STATE;
         Gui.mainFrame.adjustSensitivity();
 
-        //4. set up disk worker thread and its event handlers
         SwingBenchmarkObserver observer = new SwingBenchmarkObserver();
-        worker = new DiskWorker(observer);
-        observer.setWorker(worker);
+        SwingWorkerRunner runner = new SwingWorkerRunner(observer);
+        observer.setRunner(runner);     // give observer a reference for setProgressPublic
+        worker = runner;                // App.worker is now typed as BenchmarkRunner
 
-        worker.addPropertyChangeListener((final PropertyChangeEvent event) -> {
-            switch (event.getPropertyName()) {
-                case "progress":
-                    int value = (Integer) event.getNewValue();
-                    Gui.progressBar.setValue(value);
-                    long kbProcessed = (value) * App.targetTxSizeKb() / 100;
-                    Gui.progressBar.setString(kbProcessed + " / " + App.targetTxSizeKb());
-                    break;
-                case "state":
-                    switch ((StateValue) event.getNewValue()) {
-                        case STARTED:
-                            Gui.progressBar.setString("0 / " + App.targetTxSizeKb());
-                            break;
-                        case DONE:
-                            break;
-                    }
-                    break;
-            }
-        });
-
-        //5. start the Swing worker thread
-        worker.execute();
+        runner.execute();
     }
 
     /**
