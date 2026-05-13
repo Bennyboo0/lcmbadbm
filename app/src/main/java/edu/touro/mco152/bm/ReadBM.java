@@ -6,6 +6,7 @@ import edu.touro.mco152.bm.ui.Gui;
 import jakarta.persistence.EntityManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
@@ -79,12 +80,18 @@ public class ReadBM {
                     percentComplete = (float) unitsComplete / (float) unitsTotal * 100f;
                     observer.updateProgress((int) percentComplete);
                 }
+            }  catch (FileNotFoundException ex) {
+            //this is a message for this case
+            String emsg = "Test file not found — make sure you've run a Write benchmark first. " + ex.getMessage();
+            observer.handleReadError(emsg);
+            return false;
             } catch (IOException ex) {
-                Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-                String emsg = "May not have done Write Benchmarks, so no data available to read. " + ex.getMessage();
-                observer.handleReadError(emsg);
-                return false; //to be able to return false I turned this method into a boolean. And now, we otherwise make it return true
-            }
+            //this handles IO errors
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            String emsg = "May not have done Write Benchmarks, so no data available to read. " + ex.getMessage();
+            observer.handleReadError(emsg);
+            return false;
+        }
 
             long endTime = System.nanoTime();
             double sec = (double)(endTime - startTime) / 1_000_000_000.0;

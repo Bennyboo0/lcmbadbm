@@ -11,6 +11,8 @@ import static edu.touro.mco152.bm.App.*;
  */
 public class DiskWorker {
 
+    //to run, in terminal: ./gradlew clean build
+    //then: ./gradlew run
     private final BenchmarkObserver observer;
     private final BenchmarkRunner runner;  // used only for isCancelled()
 
