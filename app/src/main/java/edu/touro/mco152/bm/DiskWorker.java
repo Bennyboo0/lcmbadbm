@@ -1,8 +1,11 @@
 package edu.touro.mco152.bm;
+import edu.touro.mco152.bm.commands.BenchmarkExecutor;
 import edu.touro.mco152.bm.ui.Gui;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static edu.touro.mco152.bm.App.*;
+import edu.touro.mco152.bm.commands.WriteBM;
+import edu.touro.mco152.bm.commands.ReadBM;
 
 /**
  * Contains the core disk benchmark logic, decoupled from any UI or threading framework.
@@ -36,12 +39,6 @@ public class DiskWorker {
         msg("num files: " + App.numOfMarks + ", num blks: " + App.numOfBlocks
                 + ", blk size (kb): " + App.blockSizeKb + ", blockSequence: " + App.blockSequence);
 
-        int blockSize = blockSizeKb * KILOBYTE;
-        byte[] blockArr = new byte[blockSize];
-        for (int b = 0; b < blockArr.length; b++) {
-            if (b % 2 == 0) blockArr[b] = (byte) 0xFF;
-        }
-
         observer.initializeDisplay();
 
         if (App.autoReset) {
@@ -49,21 +46,23 @@ public class DiskWorker {
             Gui.resetTestData();
         }
 
+        BenchmarkExecutor executor = new BenchmarkExecutor();
 
         if (App.writeTest) {
-            WriteBM wbr = new WriteBM();
-            wbr.execute(runner, observer);
+            executor.addCommand(new WriteBM(
+                    runner, observer,
+                    App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence
+            ));
         }
 
-        if (App.readTest && App.writeTest && !runner.isCancelled()) {
-            observer.handleClearCacheRequest();
-        }
         if (App.readTest) {
-            ReadBM rbm = new ReadBM();
-            if(!rbm.execute(runner, observer)){
-                return false;
-            }
+            executor.addCommand(new ReadBM(
+                    runner, observer,
+                    App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence
+            ));
         }
+
+        executor.executeAll();
 
         App.nextMarkNumber += App.numOfMarks;
         return true;

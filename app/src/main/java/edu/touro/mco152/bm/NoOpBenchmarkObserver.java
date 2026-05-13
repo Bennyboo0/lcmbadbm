@@ -1,5 +1,7 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.persist.DiskRun;
+
 /**
  * A no-operation implementation of BenchmarkObserver that can be used for tests
  */
@@ -29,5 +31,10 @@ public class NoOpBenchmarkObserver implements BenchmarkObserver {
     public void handleReadError(String message) {
         // no-op: log it at most
         System.err.println("Read error (no-op): " + message);
+    }
+
+    @Override
+    public void addRun(DiskRun run) {
+        // purposefully does nothing
     }
 }

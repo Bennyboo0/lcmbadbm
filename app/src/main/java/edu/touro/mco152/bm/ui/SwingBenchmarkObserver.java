@@ -2,6 +2,8 @@ package edu.touro.mco152.bm.ui;
 
 import edu.touro.mco152.bm.BenchmarkObserver;
 import edu.touro.mco152.bm.DiskMark;
+import edu.touro.mco152.bm.persist.DiskRun;
+
 import javax.swing.JOptionPane;
 
 /**
@@ -58,5 +60,10 @@ public class SwingBenchmarkObserver implements BenchmarkObserver {
     public void handleReadError(String message) {
         JOptionPane.showMessageDialog(Gui.mainFrame, message,
                 "Unable to READ", JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void addRun(DiskRun run) {
+        Gui.runPanel.addRun(run);
     }
 }

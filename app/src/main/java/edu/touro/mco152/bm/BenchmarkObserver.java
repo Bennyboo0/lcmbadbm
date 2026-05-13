@@ -1,5 +1,7 @@
 package edu.touro.mco152.bm;
 
+import edu.touro.mco152.bm.persist.DiskRun;
+
 /**
  * Abstraction for all UI callbacks made during a benchmark run.
  * Implementations may be Swing-based, no-op (for testing), or any other UI framework,
@@ -17,4 +19,6 @@ public interface BenchmarkObserver {
     void handleClearCacheRequest();
 
     void handleReadError(String message);
+
+    void addRun(DiskRun run);
 }
