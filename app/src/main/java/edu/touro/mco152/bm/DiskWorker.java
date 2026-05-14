@@ -51,14 +51,14 @@ public class DiskWorker {
         if (App.writeTest) {
             executor.addCommand(new WriteBM(
                     runner, observer,
-                    App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence
+                    App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence, App.multiFile, App.writeSyncEnable
             ));
         }
 
         if (App.readTest) {
             executor.addCommand(new ReadBM(
                     runner, observer,
-                    App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence
+                    App.numOfMarks, App.numOfBlocks, App.blockSizeKb, App.blockSequence, App.multiFile
             ));
         }
 

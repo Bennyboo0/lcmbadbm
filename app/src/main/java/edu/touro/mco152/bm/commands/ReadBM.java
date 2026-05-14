@@ -25,16 +25,19 @@ public class ReadBM implements BenchmarkCommand {
     private final int numBlocks;
     private final int blockSizeKb;
     private final DiskRun.BlockSequence blockSequence;
+    private final boolean multiFile;
 
     public ReadBM(BenchmarkRunner runner, BenchmarkObserver observer,
                   int numMarks, int numBlocks, int blockSizeKb,
-                  DiskRun.BlockSequence blockSequence) {
+                  DiskRun.BlockSequence blockSequence,
+                  boolean multiFile) {
         this.runner = runner;
         this.observer = observer;
         this.numMarks = numMarks;
         this.numBlocks = numBlocks;
         this.blockSizeKb = blockSizeKb;
         this.blockSequence = blockSequence;
+        this.multiFile = multiFile;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class ReadBM implements BenchmarkCommand {
         observer.showDiskInfo(run.getDiskInfo());
 
         for (int m = startFileNum; m < startFileNum + numMarks && !runner.isCancelled(); m++) {
-            if (App.multiFile) {
+            if (multiFile) {
                 App.testFile = new File(App.dataDir.getAbsolutePath()
                         + File.separator + "testdata" + m + ".jdm");
             }

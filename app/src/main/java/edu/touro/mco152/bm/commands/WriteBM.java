@@ -24,16 +24,21 @@ public class WriteBM implements BenchmarkCommand {
     private final int numBlocks;
     private final int blockSizeKb;
     private final DiskRun.BlockSequence blockSequence;
+    private final boolean multiFile;
+    private final boolean writeSyncEnable;
 
     public WriteBM(BenchmarkRunner runner, BenchmarkObserver observer,
                    int numMarks, int numBlocks, int blockSizeKb,
-                   DiskRun.BlockSequence blockSequence) {
+                   DiskRun.BlockSequence blockSequence,
+                   boolean multiFile, boolean writeSyncEnable) {
         this.runner = runner;
         this.observer = observer;
         this.numMarks = numMarks;
         this.numBlocks = numBlocks;
         this.blockSizeKb = blockSizeKb;
         this.blockSequence = blockSequence;
+        this.multiFile = multiFile;
+        this.writeSyncEnable = writeSyncEnable;
     }
 
     @Override
@@ -61,13 +66,13 @@ public class WriteBM implements BenchmarkCommand {
         App.msg("disk info: (" + run.getDiskInfo() + ")");
         observer.showDiskInfo(run.getDiskInfo());
 
-        if (!App.multiFile) {
+        if (!multiFile) {
             App.testFile = new File(App.dataDir.getAbsolutePath()
                     + File.separator + "testdata.jdm");
         }
 
         for (int m = startFileNum; m < startFileNum + numMarks && !runner.isCancelled(); m++) {
-            if (App.multiFile) {
+            if (!multiFile) {
                 App.testFile = new File(App.dataDir.getAbsolutePath()
                         + File.separator + "testdata" + m + ".jdm");
             }
@@ -76,7 +81,7 @@ public class WriteBM implements BenchmarkCommand {
             wMark.setMarkNum(m);
             long startTime = System.nanoTime();
             long totalBytesWrittenInMark = 0;
-            String mode = App.writeSyncEnable ? "rwd" : "rw";
+            String mode = writeSyncEnable ? "rwd" : "rw";
 
             try (RandomAccessFile rAccFile = new RandomAccessFile(App.testFile, mode)) {
                 for (int b = 0; b < numBlocks; b++) {

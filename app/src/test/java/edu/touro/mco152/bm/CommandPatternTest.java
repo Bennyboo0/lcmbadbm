@@ -45,9 +45,9 @@ public class CommandPatternTest {
             } else {
                 App.msg("unable to remove existing data dir");
             }
-        } else {
-            App.dataDir.mkdirs();
         }
+        App.dataDir.mkdirs();
+
 
         App.multiFile = false;
         App.autoReset = true;
@@ -77,8 +77,8 @@ public class CommandPatternTest {
                 return null;
             }
         };
-        BenchmarkCommand write = new WriteBM(
-                runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE);
+        BenchmarkCommand write = new WriteBM(runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE,
+                false, false);
         assertTrue(write.execute());
     }
 
@@ -104,13 +104,15 @@ public class CommandPatternTest {
         };
 
         //the thing is that we have to write something b4 we can read it. so here we do that.
-        BenchmarkCommand write = new WriteBM(
-                runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE);
+        BenchmarkCommand write = new WriteBM(runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE,
+                false, false);
+
         write.execute();
+        App.nextMarkNumber = 1;
 
 
         BenchmarkCommand read = new ReadBM(
-                runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE);
+                runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE, false);
         assertTrue(read.execute());
     }
 }
