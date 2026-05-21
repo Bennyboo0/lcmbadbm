@@ -19,6 +19,4 @@ public interface BenchmarkObserver {
     void handleClearCacheRequest();
 
     void handleReadError(String message);
-
-    void addRun(DiskRun run);
 }

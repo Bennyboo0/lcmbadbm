@@ -1,6 +1,5 @@
 package edu.touro.mco152.bm;
 
-import edu.touro.mco152.bm.BenchmarkRunObserver;
 import edu.touro.mco152.bm.persist.DiskRun;
 
 /**
@@ -19,10 +18,11 @@ public class BenchmarkRulesObserver implements BenchmarkRunObserver {
     public void addRun(DiskRun run) {
         if (run.getIoMode() == DiskRun.IOMode.READ) {
             // If max time > 3% higher than average time
-            double maxTime = Double.parseDouble(run.getMax());
-            double avgTime = Double.parseDouble(run.getAvg()); //need to cast these to doubles bc of the comparison
+            double maxTime = run.getRunMax();
+            double avgTime = run.getRunAvg();
 
-            if (maxTime > (avgTime * 1.03)) {
+
+            if (avgTime > 0 && maxTime > (avgTime * 1.03)) { //we have the first condition so that this doesn't do off when a run is uninitialized
                 String msg = String.format(":warning: Read Max (%.2f ms) exceeded 3%% of Avg (%.2f ms)!",
                         maxTime, avgTime);
                 //slack.postMsg2OurChannel(msg);

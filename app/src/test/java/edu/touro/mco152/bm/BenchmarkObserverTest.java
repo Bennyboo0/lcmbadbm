@@ -20,10 +20,12 @@ public class BenchmarkObserverTest {
 
     private boolean observerWasCalled;
 
+    /**
+     * we set all this up so that we don't have anything be null
+     */
     @BeforeEach
     public void setUp() {
         observerWasCalled = false;
-
         App.numOfMarks = 1;
         App.numOfBlocks = 1;
         App.blockSizeKb = 4;
@@ -31,18 +33,15 @@ public class BenchmarkObserverTest {
         App.nextMarkNumber = 1;
         App.multiFile = false;
         App.writeSyncEnable = false;
+        App.readTest = true;
+        App.writeTest = true;
 
         App.locationDir = new File(System.getProperty("user.dir"));
         App.dataDir = new File(App.locationDir, "jDiskMarkData");
-
         if (!App.dataDir.exists()) {
             App.dataDir.mkdirs();
         }
-
         App.testFile = new File(App.dataDir, "testdata.jdm");
-
-        App.readTest = true;
-        App.writeTest = true;
     }
 
     @Test
@@ -122,6 +121,5 @@ public class BenchmarkObserverTest {
         @Override public void publishMark(DiskMark mark) {}
         @Override public void handleClearCacheRequest() {}
         @Override public void handleReadError(String message) {}
-        @Override public void addRun(DiskRun run) {}
     }
 }
