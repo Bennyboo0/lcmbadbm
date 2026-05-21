@@ -1,3 +1,8 @@
+#ignore the slack token
+slacktoken.txt
+**/slacktoken.txt
+
+
 # eclipse items
 .project
 .settings

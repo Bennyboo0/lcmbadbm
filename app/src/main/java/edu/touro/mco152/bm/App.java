@@ -230,7 +230,11 @@ public class App {
     }
 
     public static void msg(String message) {
-        Gui.mainFrame.msg(message);
+        if (Gui.mainFrame != null) {
+            Gui.mainFrame.msg(message);
+        } else {
+            System.out.println(message); //this way we don't have an error in a null case.
+        }
     }
 
     public static void cancelBenchmark() {

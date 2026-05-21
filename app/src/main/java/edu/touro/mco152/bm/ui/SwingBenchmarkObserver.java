@@ -62,7 +62,6 @@ public class SwingBenchmarkObserver implements BenchmarkObserver {
                 "Unable to READ", JOptionPane.ERROR_MESSAGE);
     }
 
-    @Override
     public void addRun(DiskRun run) {
         Gui.runPanel.addRun(run);
     }

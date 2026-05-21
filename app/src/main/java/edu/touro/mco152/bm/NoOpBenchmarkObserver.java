@@ -33,7 +33,6 @@ public class NoOpBenchmarkObserver implements BenchmarkObserver {
         System.err.println("Read error (no-op): " + message);
     }
 
-    @Override
     public void addRun(DiskRun run) {
         // purposefully does nothing
     }
