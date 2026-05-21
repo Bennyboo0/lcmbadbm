@@ -21,7 +21,4 @@ public interface BenchmarkObserver {
     void handleReadError(String message);
 
     void addRun(DiskRun run);
-
-    /**Create this for observer pattern usage*/
-    void update(DiskRun run);
 }

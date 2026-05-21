@@ -2,14 +2,13 @@ package edu.touro.mco152.bm.commands;
 
 import edu.touro.mco152.bm.*;
 import edu.touro.mco152.bm.persist.DiskRun;
-import edu.touro.mco152.bm.persist.EM;
-import jakarta.persistence.EntityManager;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList; // Added
 import java.util.Date;
+import java.util.List;        // Added
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,12 +26,14 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.READ;
 public class ReadBM implements BenchmarkCommand {
 
     private final BenchmarkRunner runner;
-    private final BenchmarkObserver observer;
+    private final BenchmarkObserver observer; // Keeps handling UI progress/errors
     private final int numMarks;
     private final int numBlocks;
     private final int blockSizeKb;
     private final DiskRun.BlockSequence blockSequence;
     private final boolean multiFile;
+
+    private final List<BenchmarkRunObserver> runObservers = new ArrayList<>();
 
     public ReadBM(BenchmarkRunner runner, BenchmarkObserver observer,
                   int numMarks, int numBlocks, int blockSizeKb,
@@ -47,10 +48,15 @@ public class ReadBM implements BenchmarkCommand {
         this.multiFile = multiFile;
     }
 
+    //this is a method to allow App or JUnit to register database, runpanel, or slack rules
+    public void registerObserver(BenchmarkRunObserver observer) {
+        runObservers.add(observer);
+    }
+
     @Override
     public boolean execute() {
         int wUnitsComplete = 0, rUnitsComplete = 0, unitsComplete;
-        int unitsTotal = numBlocks * numMarks;  // read-only context
+        int unitsTotal = numBlocks * numMarks;
         float percentComplete;
 
         int blockSize = blockSizeKb * KILOBYTE;
@@ -66,7 +72,7 @@ public class ReadBM implements BenchmarkCommand {
         run.setNumMarks(numMarks);
         run.setNumBlocks(numBlocks);
         run.setBlockSize(blockSizeKb);
-        run.setTxSize((long) numBlocks * blockSizeKb);  // computed locally, not from App
+        run.setTxSize((long) numBlocks * blockSizeKb);
         run.setDiskInfo(Util.getDiskInfo(App.dataDir));
 
         App.msg("disk info: (" + run.getDiskInfo() + ")");
@@ -128,11 +134,11 @@ public class ReadBM implements BenchmarkCommand {
             run.setEndTime(new Date());
         }
 
-        EntityManager em = EM.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(run);
-        em.getTransaction().commit();
-        observer.addRun(run);
+        //notify all dynamic end-of-benchmark observers cleanly!
+        for (BenchmarkRunObserver runObs : runObservers) {
+            runObs.addRun(run);
+        }
+
         return true;
     }
 }

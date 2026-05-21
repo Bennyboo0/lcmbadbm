@@ -2,13 +2,12 @@ package edu.touro.mco152.bm.commands;
 
 import edu.touro.mco152.bm.*;
 import edu.touro.mco152.bm.persist.DiskRun;
-import edu.touro.mco152.bm.persist.EM;
-import jakarta.persistence.EntityManager;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,7 +21,6 @@ import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
  * Encapsulates the complete life cycle of writing blocks to a temporary file and
  * broadcasting performance updates back to an observer.
  */
-
 public class WriteBM implements BenchmarkCommand {
 
     private final BenchmarkRunner runner;
@@ -33,6 +31,9 @@ public class WriteBM implements BenchmarkCommand {
     private final DiskRun.BlockSequence blockSequence;
     private final boolean multiFile;
     private final boolean writeSyncEnable;
+
+    //see how this ist typed specifically to BenchmarkRunObserver interface
+    private final List<BenchmarkRunObserver> runObservers = new ArrayList<>();
 
     public WriteBM(BenchmarkRunner runner, BenchmarkObserver observer,
                    int numMarks, int numBlocks, int blockSizeKb,
@@ -46,6 +47,13 @@ public class WriteBM implements BenchmarkCommand {
         this.blockSequence = blockSequence;
         this.multiFile = multiFile;
         this.writeSyncEnable = writeSyncEnable;
+    }
+
+    /**
+     * Registers a post-benchmark activity observer.
+     */
+    public void registerObserver(BenchmarkRunObserver observer) {
+        runObservers.add(observer);
     }
 
     @Override
@@ -123,11 +131,11 @@ public class WriteBM implements BenchmarkCommand {
             run.setEndTime(new Date());
         }
 
-        EntityManager em = EM.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(run);
-        em.getTransaction().commit();
-        observer.addRun(run);
+        // now notify all dynamic post-benchmark observers using your clean interface!
+        for (BenchmarkRunObserver runObs : runObservers) {
+            runObs.addRun(run);
+        }
+
         return true;
     }
 }
