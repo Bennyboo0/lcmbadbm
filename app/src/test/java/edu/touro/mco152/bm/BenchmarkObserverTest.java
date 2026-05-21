@@ -32,8 +32,17 @@ public class BenchmarkObserverTest {
         App.multiFile = false;
         App.writeSyncEnable = false;
 
-        App.dataDir = new File(System.getProperty("user.dir"));
+        App.locationDir = new File(System.getProperty("user.dir"));
+        App.dataDir = new File(App.locationDir, "jDiskMarkData");
+
+        if (!App.dataDir.exists()) {
+            App.dataDir.mkdirs();
+        }
+
         App.testFile = new File(App.dataDir, "testdata.jdm");
+
+        App.readTest = true;
+        App.writeTest = true;
     }
 
     @Test
