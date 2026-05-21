@@ -1,6 +1,7 @@
 package edu.touro.mco152.bm;
 
 import edu.touro.mco152.bm.commands.BenchmarkCommand;
+import edu.touro.mco152.bm.commands.BenchmarkExecutor;
 import edu.touro.mco152.bm.persist.DiskRun;
 import edu.touro.mco152.bm.ui.Gui;
 import edu.touro.mco152.bm.ui.MainFrame;
@@ -13,7 +14,7 @@ import java.io.File;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class CommandPatternTest {
 
@@ -48,7 +49,6 @@ public class CommandPatternTest {
         }
         App.dataDir.mkdirs();
 
-
         App.multiFile = false;
         App.autoReset = true;
     }
@@ -57,62 +57,42 @@ public class CommandPatternTest {
     void testWriteCommand() {
         BenchmarkObserver observer = new NoOpBenchmarkObserver();
         BenchmarkRunner runner = new BenchmarkRunner() {
-            @Override
-            public void execute() {
-
-            }
-
-            @Override
-            public void cancel() {
-
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return false;
-            }
-
-            @Override
-            public Boolean getLastStatus() {
-                return null;
-            }
+            @Override public void execute() {}
+            @Override public void cancel() {}
+            @Override public boolean isCancelled() { return false; }
+            @Override public Boolean getLastStatus() { return null; }
         };
-        BenchmarkCommand write = new WriteBM(runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE,
-                false, false);
-        assertTrue(write.execute());
+
+        BenchmarkCommand write = new WriteBM(runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE, false, false);
+        BenchmarkExecutor executor = new BenchmarkExecutor();
+        executor.addCommand(write);
+
+        assertDoesNotThrow(() -> executor.executeAll());
+
+        assertTrue(App.testFile.exists(), "Executor failed to properly trigger the WriteBM file creation.");
     }
 
     @Test
     void testReadCommand() {
         BenchmarkObserver observer = new NoOpBenchmarkObserver();
         BenchmarkRunner runner = new BenchmarkRunner() {
-            @Override
-            public void execute() {}
-
-            @Override
-            public void cancel() {}
-
-            @Override
-            public boolean isCancelled() {
-                return false;
-            }
-
-            @Override
-            public Boolean getLastStatus() {
-                return null;
-            }
+            @Override public void execute() {}
+            @Override public void cancel() {}
+            @Override public boolean isCancelled() { return false; }
+            @Override public Boolean getLastStatus() { return null; }
         };
 
-        //the thing is that we have to write something b4 we can read it. so here we do that.
-        BenchmarkCommand write = new WriteBM(runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE,
-                false, false);
+        BenchmarkCommand write = new WriteBM(runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE, false, false);
+        BenchmarkExecutor writeExecutor = new BenchmarkExecutor();
+        writeExecutor.addCommand(write);
+        writeExecutor.executeAll();
 
-        write.execute();
         App.nextMarkNumber = 1;
 
+        BenchmarkCommand read = new ReadBM(runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE, false);
+        BenchmarkExecutor readExecutor = new BenchmarkExecutor();
+        readExecutor.addCommand(read);
 
-        BenchmarkCommand read = new ReadBM(
-                runner, observer, NUM_MARKS, NUM_BLOCKS, BLOCK_SIZE_KB, SEQUENCE, false);
-        assertTrue(read.execute());
+        assertDoesNotThrow(() -> readExecutor.executeAll());
     }
 }

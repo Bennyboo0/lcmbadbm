@@ -16,6 +16,13 @@ import static edu.touro.mco152.bm.App.KILOBYTE;
 import static edu.touro.mco152.bm.App.MEGABYTE;
 import static edu.touro.mco152.bm.DiskMark.MarkType.WRITE;
 
+/**
+ * Concrete implementation of BenchmarkCommand handling sequential or random
+ * disk write benchmark operations.
+ * Encapsulates the complete life cycle of writing blocks to a temporary file and
+ * broadcasting performance updates back to an observer.
+ */
+
 public class WriteBM implements BenchmarkCommand {
 
     private final BenchmarkRunner runner;
@@ -44,7 +51,7 @@ public class WriteBM implements BenchmarkCommand {
     @Override
     public boolean execute() {
         int wUnitsComplete = 0, rUnitsComplete = 0, unitsComplete;
-        int unitsTotal = numBlocks * numMarks;  // write-only context
+        int unitsTotal = numBlocks * numMarks;
         float percentComplete;
 
         int blockSize = blockSizeKb * KILOBYTE;
@@ -60,7 +67,7 @@ public class WriteBM implements BenchmarkCommand {
         run.setNumMarks(numMarks);
         run.setNumBlocks(numBlocks);
         run.setBlockSize(blockSizeKb);
-        run.setTxSize((long) numBlocks * blockSizeKb);  // computed locally, not from App
+        run.setTxSize((long) numBlocks * blockSizeKb);
         run.setDiskInfo(Util.getDiskInfo(App.dataDir));
 
         App.msg("disk info: (" + run.getDiskInfo() + ")");
@@ -72,7 +79,8 @@ public class WriteBM implements BenchmarkCommand {
         }
 
         for (int m = startFileNum; m < startFileNum + numMarks && !runner.isCancelled(); m++) {
-            if (!multiFile) {
+
+            if (multiFile) {
                 App.testFile = new File(App.dataDir.getAbsolutePath()
                         + File.separator + "testdata" + m + ".jdm");
             }
@@ -119,7 +127,7 @@ public class WriteBM implements BenchmarkCommand {
         em.getTransaction().begin();
         em.persist(run);
         em.getTransaction().commit();
-        observer.addRun(run);  // <-- NOT Gui.runPanel.addRun(run) directly
+        observer.addRun(run);
         return true;
     }
 }

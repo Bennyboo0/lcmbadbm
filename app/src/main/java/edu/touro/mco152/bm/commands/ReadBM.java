@@ -17,6 +17,13 @@ import static edu.touro.mco152.bm.App.KILOBYTE;
 import static edu.touro.mco152.bm.App.MEGABYTE;
 import static edu.touro.mco152.bm.DiskMark.MarkType.READ;
 
+/**
+ * Concrete implementation of BenchmarkCommand handling sequential or random
+ * disk read benchmark operations.
+ * Assumes a prior write operation has established the target files; attempts to safely
+ * parse performance data and handle missing file constraints gracefully.
+ */
+
 public class ReadBM implements BenchmarkCommand {
 
     private final BenchmarkRunner runner;
@@ -65,7 +72,13 @@ public class ReadBM implements BenchmarkCommand {
         App.msg("disk info: (" + run.getDiskInfo() + ")");
         observer.showDiskInfo(run.getDiskInfo());
 
+        if (!multiFile) {
+            App.testFile = new File(App.dataDir.getAbsolutePath()
+                    + File.separator + "testdata.jdm");
+        }
+
         for (int m = startFileNum; m < startFileNum + numMarks && !runner.isCancelled(); m++) {
+
             if (multiFile) {
                 App.testFile = new File(App.dataDir.getAbsolutePath()
                         + File.separator + "testdata" + m + ".jdm");
@@ -119,7 +132,7 @@ public class ReadBM implements BenchmarkCommand {
         em.getTransaction().begin();
         em.persist(run);
         em.getTransaction().commit();
-        observer.addRun(run);  // <-- NOT Gui.runPanel.addRun(run) directly
+        observer.addRun(run);
         return true;
     }
 }
