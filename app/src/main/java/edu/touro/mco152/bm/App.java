@@ -287,6 +287,8 @@ public class App {
                 msg("unable to remove existing data dir");
             }
         }
+        App.dataDir.mkdirs();
+
 
         // Create data dir if not already present
         if (!dataDir.exists()) {
